@@ -1,0 +1,445 @@
+description: |-
+  SURFACE MECHANISM OF CH4 REFORMING AND OXIDATION OVER NI
+  ***********************************************************************
+  ****
+  ****     CH4 ON Ni - SURFACE MECHANISM                                *
+  ****
+  ****     Version 3.0    2014                                          *
+  ****                                                                  *
+  ****     K. Herrera Delgado, L. Maier, O. Deutschmann                 *
+  ****     KIT Karlsruhe                                                *
+  ****                temp. range 500 - 2000K                           *
+  ****
+  ****     Reference:
+  ****     V.M. Janardhanan, O. Deutschmann.
+  ****         Journal of Power Sources 162 (2006), 1192-1202
+  ****     www.detchem.com/mechanisms
+  ****
+  ****     Kinetic data:
+  ****      k = A * T**b * exp (-Ea/RT)         A          b       Ea
+  ****                                       (cm,mol,s)    -      kJ/mol
+  ****
+  ****
+  ****     Surface site density: 2.66E-9 mol/cm**2
+  ****
+  ****
+  ****     (SURFACE CHEMKIN format)
+  ****
+  ***********************************************************************
+
+generator: ck2yaml
+input-files: [sm_Ni.txt, td_Ni.txt]
+cantera-version: 2.5.1
+date: Tue, 20 Feb 2024 10:24:35 -0700
+
+units: {length: cm, time: s, quantity: mol, activation-energy: kJ/mol}
+
+phases:
+- name: reformate-bulk
+  thermo: ideal-gas
+  elements: [C, H, O, N]
+  species: [H2, O2, CH4, H2O, CO, CO2, N2]
+  transport: mixture-averaged
+  state: {T: 300.0, P: 1 atm}
+- name: reformate-part
+  thermo: ideal-gas
+  elements: [C, H, O]
+  species: [H2, CH4, H2O, CO2, CO, O2]
+  transport: mixture-averaged
+  state: {T: 300.0, P: 1 atm}
+- name: reformate-part-nosurf
+  thermo: ideal-gas
+  elements: [C, H, O]
+  species: [H2, CH4, H2O, CO2, CO]
+  transport: mixture-averaged
+  state: {T: 300.0, P: 1 atm}
+- name: reformate
+  thermo: ideal-gas
+  elements: [C, H, O, N]
+  species: [H2, O2, CH4, H2O, CO2, CO, N2]
+  transport: mixture-averaged
+  state: {T: 300.0, P: 1 atm}
+- name: surf
+  thermo: ideal-surface
+  adjacent-phases: [reformate-bulk]
+  elements: [C, H, O, Ni]
+  species: [HCO(s), CO2(s), O(s), CH4(s), CH(s), CH2(s), CH3(s), C(s),
+    OH(s), COOH(s), H(s), H2O(s), CO(s), Ni(s)]
+  site-density: 2.66e-09
+  Motz-Wise: true
+  kinetics: surface
+  state: {T: 300.0, P: 1 atm}
+
+species:
+- name: H2
+  composition: {H: 2}
+  thermo:
+    model: NASA7
+    temperature-ranges: [300.0, 1000.0, 5000.0]
+    data:
+    - [0.33553514E+01, 0.50136144E-03, -0.23006908E-06, -0.47905324E-09, 0.48522585E-12,
+      -0.10191626E+04, -0.35477228E+01]
+    - [0.30667095E+01, 0.57473755E-03, 0.13938319E-07, -0.25483518E-10, 0.29098574E-14,
+      -0.86547412E+03, -0.17798424E+01]
+  transport:
+    model: gas
+    geometry: linear
+    well-depth: 38.0
+    diameter: 2.92
+    polarizability: 0.79
+    rotational-relaxation: 280.0
+- name: O2
+  composition: {O: 2}
+  thermo:
+    model: NASA7
+    temperature-ranges: [300.0, 1000.0, 5000.0]
+    data:
+    - [0.37837135E+01, -0.30233634E-02, 0.99492751E-05, -0.98189101E-08, 0.33031825E-11,
+      -0.10638107E+04, 0.36416345E+01 ]
+    - [0.36122139E+01, 0.74853166E-03, -0.19820647E-06, 0.33749008E-10, -0.23907374E-14,
+      -0.11978151E+04, 0.36703307E+01]
+  transport:
+    model: gas
+    geometry: linear
+    well-depth: 107.4
+    diameter: 3.458
+    polarizability: 1.6
+    rotational-relaxation: 3.8
+- name: CH4
+  composition: {C: 1, H: 4}
+  thermo:
+    model: NASA7
+    temperature-ranges: [300.0, 1000.0, 5000.0]
+    data:
+    - [0.77874148E+00, 0.17476683E-01, -0.27834090E-04, 0.30497080E-07, -0.12239307E-10,
+      -0.98252285E+04, 0.13722195E+02]
+    - [0.16834788E+01, 0.10237236E-01, -0.38751286E-05, 0.67855849E-09, -0.45034231E-13,
+      -0.10080787E+05, 0.96233950E+01]
+  transport:
+    model: gas
+    geometry: nonlinear
+    well-depth: 141.4
+    diameter: 3.746
+    polarizability: 2.6
+    rotational-relaxation: 13.0
+- name: H2O
+  composition: {H: 2, O: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [300.0, 1000.0, 5000.0]
+    data:
+    - [0.41677234E+01, -0.18114970E-02, 0.59471288E-05, -0.48692021E-08, 0.15291991E-11,
+      -0.30289969E+05, -0.73135474E+00]
+    - [0.26110472E+01, 0.31563130E-02, -0.92985438E-06, 0.13331538E-09, -0.74689351E-14,
+      -0.29868167E+05, 0.72091268E+01]
+  transport:
+    model: gas
+    geometry: nonlinear
+    well-depth: 572.4
+    diameter: 2.605
+    dipole: 1.844
+    rotational-relaxation: 4.0
+- name: CO2
+  composition: {C: 1, O: 2}
+  thermo:
+    model: NASA7
+    temperature-ranges: [300.0, 1000.0, 5000.0]
+    data:
+    - [0.22757246E+01, 0.99220723E-02, -0.10409113E-04, 0.68666868E-08, -0.21172801E-11,
+      -0.48373141E+05, 0.10188488E+02]
+    - [0.44536228E+01, 0.31401687E-02, -0.12784105E-05, 0.23939967E-09, -0.16690332E-13,
+      -0.48966961E+05, -0.95539588E+00]
+  transport:
+    model: gas
+    geometry: linear
+    well-depth: 244.0
+    diameter: 3.763
+    polarizability: 2.65
+    rotational-relaxation: 2.1
+- name: CO
+  composition: {C: 1, O: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [300.0, 1000.0, 5000.0]
+    data:
+    - [0.32624517E+01, 0.15119409E-02, -0.38817552E-05, 0.55819442E-08, -0.24749512E-11,
+      -0.14310539E+05, 0.48488970E+01]
+    - [0.30250781E+01, 0.14426885E-02, -0.56308278E-06, 0.10185813E-09, -0.69109516E-14,
+      -0.14268350E+05, 0.61082177E+01]
+  transport:
+    model: gas
+    geometry: linear
+    well-depth: 98.1
+    diameter: 3.65
+    polarizability: 1.95
+    rotational-relaxation: 1.8
+- name: N2
+  composition: {N: 2}
+  thermo:
+    model: NASA7
+    temperature-ranges: [300.0, 1000.0, 5000.0]
+    data:
+    - [0.37044177E+01, -0.14218753E-02, 0.28670392E-05, -0.12028885E-08, -0.13954677E-13, 
+      -0.10640795E+04, 0.22336285E+01]
+    - [0.28532899E+01, 0.16022128E-02, -0.62936893E-06, 0.11441022E-09, -0.78057465E-14, 
+      -0.89008093E+03, 0.63964897E+01]
+  transport:
+    model: gas
+    geometry: linear
+    well-depth: 97.53
+    diameter: 3.621
+    polarizability: 1.76
+    rotational-relaxation: 4.0
+- name: Ni(s)
+  composition: {Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [300.0, 1000.0, 3000.0]
+    data:
+    - [0.00000000E+00, 0.00000000E+00, 0.00000000E+00, 0.00000000E+00, 0.00000000E+00,
+      0.00000000E+00, 0.00000000E+00]
+    - [0.00000000E+00, 0.00000000E+00, 0.00000000E+00, 0.00000000E+00, 0.00000000E+00,
+      0.00000000E+00, 0.00000000E+00]
+- name: H2O(s)
+  composition: {H: 2, O: 1, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.35042138E+01, 0.66859484E-03, 0.17626874E-05, -0.11703015E-08, 0.22618536E-12,
+      -0.37912917E+05, -0.10558253E+02]
+    - [0.35042138E+01, 0.66859484E-03, 0.17626874E-05, -0.11703015E-08, 0.22618536E-12,
+      -0.37912917E+05, -0.10558253E+02]
+- name: H(s)
+  composition: {H: 1, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.13852235E+01, -0.36029151E-04, 0.10148288E-05, -0.63923405E-09, 0.12606464E-12,
+      -0.54588657E+04, -0.50426290E+01]
+    - [0.13852235E+01, -0.36029151E-04, 0.10148288E-05, -0.63923405E-09, 0.12606464E-12,
+      -0.54588657E+04, -0.50426290E+01]
+- name: COOH(s)
+  composition: {C: 1, H: 1, O: 2, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.00000000E+00, 0.00000000E+00, 0.00000000E+00, 0.00000000E+00, 0.00000000E+00,
+      -0.12188203E+05, 0.14958018E+02]
+    - [0.00000000E+00, 0.00000000E+00, 0.00000000E+00, 0.00000000E+00, 0.00000000E+00,
+      -0.12188203E+05, 0.14958018E+02]
+- name: OH(s)
+  composition: {H: 1, O: 1, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.20890550E+01, 0.17144390E-02, -0.42783855E-06, 0.91121141E-11, 0.11376037E-13,
+      -0.26733430E+05, -0.38613884E+01]
+    - [0.20890550E+01, 0.17144390E-02, -0.42783855E-06, 0.91121141E-11, 0.11376037E-13,
+      -0.26733430E+05, -0.38613884E+01]
+- name: CO(s)
+  composition: {C: 1, O: 1, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.10495840E+01, 0.53782555E-02, -0.35189591E-05, 0.10632343E-08, -0.11268924E-12,
+      -0.27374439E+05, 0.76055902E+01]
+    - [0.10495840E+01, 0.53782555E-02, -0.35189591E-05, 0.10632343E-08, -0.11268924E-12,
+      -0.27374439E+05, 0.76055902E+01]
+- name: C(s)
+  composition: {C: 1, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [-0.34933091E+01, 0.52352469E-02, -0.30330892E-05, 0.65561104E-09, -0.14096655E-13,
+      -0.22312473E+04, 0.76842124E+01]
+    - [-0.34933091E+01, 0.52352469E-02, -0.30330892E-05, 0.65561104E-09, -0.14096655E-13,
+      -0.22312473E+04, 0.76842124E+01]
+- name: CH3(s)
+  composition: {C: 1, H: 3, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [-0.61076060E+00, 0.86161251E-02, -0.21771493E-05, -0.66381529E-09, 0.31381932E-12,
+      -0.88979208E+04, -0.20082870E+01]
+    - [-0.61076060E+00, 0.86161251E-02, -0.21771493E-05, -0.66381529E-09, 0.31381932E-12,
+      -0.88979208E+04, -0.20082870E+01]
+- name: CH2(s)
+  composition: {C: 1, H: 2, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [-0.15691759E+01, 0.73094888E-02, -0.23368400E-05, -0.26357539E-09, 0.20887732E-12,
+      0.19430750E+04, 0.44426598E+01]
+    - [-0.15691759E+01, 0.73094888E-02, -0.23368400E-05, -0.26357539E-09, 0.20887732E-12,
+      0.19430750E+04, 0.44426598E+01]
+- name: CH(s)
+  composition: {C: 1, H: 1, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [-0.25276235E+01, 0.60029740E-02, -0.24966946E-05, 0.13675870E-09, 0.10391580E-12,
+      0.95668107E+04, 0.74401015E+01]
+    - [-0.25276235E+01, 0.60029740E-02, -0.24966946E-05, 0.13675870E-09, 0.10391580E-12,
+      0.95668107E+04, 0.74401015E+01]
+- name: CH4(s)
+  composition: {C: 1, H: 4, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.34765146E+00, 0.99227736E-02, -0.20174749E-05, -0.10640458E-08, 0.41875938E-12,
+      -0.13899727E+05, -0.46164625E+01]
+    - [0.34765146E+00, 0.99227736E-02, -0.20174749E-05, -0.10640458E-08, 0.41875938E-12,
+      -0.13899727E+05, -0.46164625E+01]
+- name: O(s)
+  composition: {O: 1, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.93388577E+00, 0.14928749E-02, -0.15115381E-05, 0.76013345E-09, -0.14249939E-12,
+      -0.28801188E+05, -0.34724750E+01]
+    - [0.93388577E+00, 0.14928749E-02, -0.15115381E-05, 0.76013345E-09, -0.14249939E-12,
+      -0.28801188E+05, -0.34724750E+01]
+- name: CO2(s)
+  composition: {C: 1, O: 2, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.21578208E+01, 0.88579810E-02, -0.73329557E-05, 0.30145547E-08, -0.48361741E-12,
+      -0.51721137E+05, -0.39677820E+00]
+    - [0.21578208E+01, 0.88579810E-02, -0.73329557E-05, 0.30145547E-08, -0.48361741E-12,
+      -0.51721137E+05, -0.39677820E+00]
+- name: HCO(s)
+  composition: {C: 1, H: 1, O: 1, Ni: 1}
+  thermo:
+    model: NASA7
+    temperature-ranges: [500.0, 2000.0, 2000.0]
+    data:
+    - [0.14205486E+01, 0.64189860E-02, -0.32561122E-05, 0.66040647E-09, -0.12595880E-13,
+      -0.17229959E+05, -0.13406041E+01]
+    - [0.14205486E+01, 0.64189860E-02, -0.32561122E-05, 0.66040647E-09, -0.12595880E-13,
+      -0.17229959E+05, -0.13406041E+01]
+
+reactions:
+- equation: H2 + 2 Ni(s) => 2 H(s)  # Reaction 1
+  sticking-coefficient: {A: 3.000e-02, b: -0.000, Ea: 5.000}
+- equation: 2 H(s) => H2 + 2 Ni(s)  # Reaction 2
+  rate-constant: {A: 2.544e+20, b: 0.000, Ea: 95.209}
+- equation: O2 + 2 Ni(s) => 2 O(s)  # Reaction 3
+  sticking-coefficient: {A: 4.358e-02, b: -0.206, Ea: 1.511}
+- equation: 2 O(s) => O2 + 2 Ni(s)  # Reaction 4
+  rate-constant: {A: 1.188e+21, b: 0.823, Ea: 468.907}
+- equation: CH4 + Ni(s) => CH4(s)  # Reaction 5
+  sticking-coefficient: {A: 8.000e-03, b: 0.000, Ea: 0.000}
+- equation: CH4(s) => CH4 + Ni(s)  # Reaction 6
+  rate-constant: {A: 8.705e+15, b: 0.000, Ea: 37.550}
+- equation: H2O + Ni(s) => H2O(s)  # Reaction 7
+  sticking-coefficient: {A: 9.999e-2, b: 0.000, Ea: 0.000}
+- equation: H2O(s) => H2O + Ni(s)  # Reaction 8
+  rate-constant: {A: 3.734e+12, b: 0.000, Ea: 60.791}
+- equation: CO2 + Ni(s) => CO2(s)  # Reaction 9
+  sticking-coefficient: {A: 7.001e-06, b: 0.000, Ea: 0.000}
+- equation: CO2(s) => CO2 + Ni(s)  # Reaction 10
+  rate-constant: {A: 6.442e+07, b: 0.000, Ea: 25.979}
+- equation: CO + Ni(s) => CO(s)  # Reaction 11
+  sticking-coefficient: {A: 4.999e-01, b: 0.000, Ea: 0.000}
+- equation: CO(s) => CO + Ni(s)  # Reaction 12
+  rate-constant: {A: 3.566e+11, b: 0.000, Ea: 111.271}
+  coverage-dependencies: {CO(s): {a: 0.000e+00, m: 0.000, E: -50.000}}
+- equation: H(s) + O(s) => Ni(s) + OH(s)  # Reaction 13
+  rate-constant: {A: 3.951e+23, b: -0.188, Ea: 104.346}
+- equation: Ni(s) + OH(s) => H(s) + O(s)  # Reaction 14
+  rate-constant: {A: 2.254e+20, b: 0.188, Ea: 29.644}
+- equation: H(s) + OH(s) => Ni(s) + H2O(s)  # Reaction 15
+  rate-constant: {A: 1.854e+20, b: 0.086, Ea: 41.517}
+- equation: Ni(s) + H2O(s) => H(s) + OH(s)  # Reaction 16
+  rate-constant: {A: 3.674e+21, b: -0.086, Ea: 92.943}
+- equation: 2 OH(s) => H2O(s) + O(s)  # Reaction 17
+  rate-constant: {A: 2.346e+20, b: 0.274, Ea: 92.366}
+- equation: H2O(s) + O(s) => 2 OH(s)  # Reaction 18
+  rate-constant: {A: 8.148e+24, b: -0.274, Ea: 218.494}
+- equation: C(s) + O(s) => Ni(s) + CO(s)  # Reaction 19
+  rate-constant: {A: 3.402e+23, b: -0.000, Ea: 148.001}
+- equation: Ni(s) + CO(s) => C(s) + O(s)  # Reaction 20
+  rate-constant: {A: 1.758e+13, b: 0.000, Ea: 116.239}
+  coverage-dependencies: {CO(s): {a: 0.000e+00, m: 0.000, E: -50.000}}
+- equation: CO(s) + O(s) => Ni(s) + CO2(s)  # Reaction 21
+  rate-constant: {A: 2.002e+19, b: -0.000, Ea: 123.601}
+  coverage-dependencies: {CO(s): {a: 0.000e+00, m: 0.000, E: -50.000}}
+- equation: Ni(s) + CO2(s) => CO(s) + O(s)  # Reaction 22
+  rate-constant: {A: 4.648e+23, b: -1.000, Ea: 89.319}
+- equation: Ni(s) + HCO(s) => H(s) + CO(s)  # Reaction 23
+  rate-constant: {A: 3.710e+21, b: -0.000, Ea: 0.003}
+  coverage-dependencies: {CO(s): {a: 0.000e+00, m: 0.000, E: 50.000}}
+- equation: H(s) + CO(s) => Ni(s) + HCO(s)  # Reaction 24
+  rate-constant: {A: 4.009e+20, b: -1.000, Ea: 132.227}
+- equation: Ni(s) + HCO(s) => CH(s) + O(s)  # Reaction 25
+  rate-constant: {A: 3.796e+14, b: -0.000, Ea: 81.911}
+- equation: CH(s) + O(s) => Ni(s) + HCO(s)  # Reaction 26
+  rate-constant: {A: 4.5994e+20, b: 0.000, Ea: 109.969}
+- equation: Ni(s) + CH4(s) => H(s) + CH3(s)  # Reaction 27
+  rate-constant: {A: 1.548e+21, b: 0.087, Ea: 55.825}
+- equation: H(s) + CH3(s) => Ni(s) + CH4(s)  # Reaction 28
+  rate-constant: {A: 1.443e+22, b: -0.087, Ea: 63.455}
+- equation: Ni(s) + CH3(s) => H(s) + CH2(s)  # Reaction 29
+  rate-constant: {A: 1.548e+24, b: 0.087, Ea: 98.125}
+- equation: H(s) + CH2(s) => Ni(s) + CH3(s)  # Reaction 30
+  rate-constant: {A: 3.091e+23, b: -0.087, Ea: 57.205}
+- equation: Ni(s) + CH2(s) => H(s) + CH(s)  # Reaction 31
+  rate-constant: {A: 1.548e+24, b: 0.087, Ea: 95.225}
+- equation: H(s) + CH(s) => Ni(s) + CH2(s)  # Reaction 32
+  rate-constant: {A: 9.774e+24, b: -0.087, Ea: 81.055}
+- equation: Ni(s) + CH(s) => H(s) + C(s)  # Reaction 33
+  rate-constant: {A: 9.888e+20, b: 0.500, Ea: 21.991}
+- equation: H(s) + C(s) => Ni(s) + CH(s)  # Reaction 34
+  rate-constant: {A: 1.707e+24, b: -0.500, Ea: 157.919}
+- equation: CH4(s) + O(s) => OH(s) + CH3(s)  # Reaction 35
+  rate-constant: {A: 5.621e+24, b: -0.101, Ea: 87.872}
+- equation: OH(s) + CH3(s) => CH4(s) + O(s)  # Reaction 36
+  rate-constant: {A: 2.987e+22, b: 0.101, Ea: 25.798}
+- equation: CH3(s) + O(s) => OH(s) + CH2(s)  # Reaction 37
+  rate-constant: {A: 1.223e+25, b: -0.101, Ea: 130.672}
+- equation: OH(s) + CH2(s) => CH3(s) + O(s)  # Reaction 38
+  rate-constant: {A: 1.393e+21, b: 0.101, Ea: 19.048}
+- equation: CH2(s) + O(s) => OH(s) + CH(s)  # Reaction 39
+  rate-constant: {A: 1.223e+25, b: -0.101, Ea: 131.372}
+- equation: OH(s) + CH(s) => CH2(s) + O(s)  # Reaction 40
+  rate-constant: {A: 4.407e+22, b: 0.101, Ea: 42.498}
+- equation: CH(s) + O(s) => OH(s) + C(s)  # Reaction 41
+  rate-constant: {A: 2.471e+21, b: 0.312, Ea: 57.742}
+- equation: OH(s) + C(s) => CH(s) + O(s)  # Reaction 42
+  rate-constant: {A: 2.433e+21, b: -0.312, Ea: 118.968}
+- equation: 2 CO(s) => CO2(s) + C(s)  # Reaction 43
+  rate-constant: {A: 1.624e+14, b: 0.500, Ea: 241.761}
+  coverage-dependencies: {CO(s): {a: 0.000e+00, m: 0.000, E: -100.000}}
+- equation: CO2(s) + C(s) => 2 CO(s)  # Reaction 44
+  rate-constant: {A: 7.294e+28, b: -0.500, Ea: 239.239}
+- equation: COOH(s) + Ni(s) => CO2(s) + H(s)  # Reaction 45
+  rate-constant: {A: 3.737e+20, b: 0.475, Ea: 33.656}
+- equation: CO2(s) + H(s) => COOH(s) + Ni(s)  # Reaction 46
+  rate-constant: {A: 6.250e+24, b: -0.475, Ea: 117.344}
+- equation: COOH(s) + Ni(s) => CO(s) + OH(s)  # Reaction 47
+  rate-constant: {A: 1.461e+24, b: -0.213, Ea: 54.366}
+- equation: CO(s) + OH(s) => COOH(s) + Ni(s)  # Reaction 48
+  rate-constant: {A: 6.003e+20, b: 0.213, Ea: 97.634}
+  coverage-dependencies: {CO(s): {a: 0.000e+00, m: 0.000, E: -50.000}}
+- equation: C(s) + OH(s) => CO(s) + H(s)  # Reaction 49
+  rate-constant: {A: 3.888e+25, b: 0.188, Ea: 62.555}
+- equation: CO(s) + H(s) => C(s) + OH(s)  # Reaction 50
+  rate-constant: {A: 3.522e+18, b: -0.188, Ea: 105.495}
+  coverage-dependencies: {CO(s): {a: 0.000e+00, m: 0.000, E: -50.000}}
+- equation: COOH(s) + H(s) => HCO(s) + OH(s)  # Reaction 51
+  rate-constant: {A: 6.000e+22, b: -1.163, Ea: 104.878}
+- equation: HCO(s) + OH(s) => COOH(s) + H(s)  # Reaction 52
+  rate-constant: {A: 2.282e+20, b: 0.263, Ea: 15.922}
