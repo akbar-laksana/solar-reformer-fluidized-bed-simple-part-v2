@@ -511,7 +511,7 @@ def solarReact_ExtractPlotter(gas, gas_surf, surf, part, wall, GasParams, PartPa
               fontsize=fsz2,loc='best', ncol=2)
     
     ax.add_artist(spec)
-    ax.add_artist(loc)
+    #ax.add_artist(loc)
     
     if save == 1:
         plt.savefig(SolFilePath + '/Xk_bg.jpg',bbox_inches='tight', dpi = 900)

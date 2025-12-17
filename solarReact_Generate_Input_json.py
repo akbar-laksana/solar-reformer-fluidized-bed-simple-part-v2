@@ -136,17 +136,17 @@ BedParams['isothermal'] = 2 # 1 = isothermal case, 2 = spatially dependent tempe
 
 #%% Set dispersion model
 BedParams['species_dispersion'] = 2 # 1 = with dispersion, 2 = without dispersion
-BedParams['thermal_dispersion'] = 1 # 1 = with dispersion, 2 = without dispersion
+BedParams['thermal_dispersion'] = 2 # 1 = with dispersion, 2 = without dispersion
 
 #%% Solve interface species of not
 PartParams['interface'] = 1 # 1 = solve interface species, 2 = do not solve interface species
 
 #%% Solve Momentum equations
-BedParams['gas_momentum'] = 2 # 1 = solve momentum eqn, 2 = do not solve momentum eqn
+BedParams['gas_momentum'] = 1 # 1 = solve momentum eqn, 2 = do not solve momentum eqn
 BedParams['solid_momentum'] = 1 # 1 = solve momentum eqn, 2 = do not solve momentum eqn
 
 #%% Sherwood number correlation
-PartParams['Sherwood'] = 'Zhang' # Gunn, Frossling, Zhang
+PartParams['Sherwood'] = 'constant' # Gunn, Frossling, Zhang, constant
 
 #%% Nusselt number correlation
 BedParams['Nusselt'] = 'Gunn' # Gunn, other, Zhang
@@ -186,9 +186,9 @@ else:
     PartParams['simple_part'] = 1   
     
 #%% Set gas flow conditions
-mdot_g_flux     = [1.5] * n_files              # Fluidizing gas inlet mass flux [kg/m^2-s]
+mdot_g_flux     = [1.0] * n_files              # Fluidizing gas inlet mass flux [kg/m^2-s]
 Tg_in           = [(700 + 273.15)] * n_files   # Fluidizing gas inlet temperature [K]
-Pg_in           = [15.0E5] * n_files           # Fluidizing gas outlet pressure [Pa]
+Pg_in           = [10.0E5] * n_files           # Fluidizing gas outlet pressure [Pa]
 
 # Gas information
 gas['R']                = ct.gas_constant
@@ -208,7 +208,7 @@ if gas['kspec'] == 7:
 
 # Mole ratio of inlet CO2 and H2O with CH4   
 rat_CO2 = 0.0
-rat_H2O = 3.0
+rat_H2O = 2.0
 
 # Percent [%] Mole(volume) of inert gas N2 to calculate mole ratio of N2 with CH4
 vol_N2 = 0/100
@@ -234,8 +234,8 @@ mdot_p_flux     = [0] * n_files                     # Particle inlet mass flux [
 
 #%% Set particle/surface parameters
 dp              = [600e-6] * n_files       # Particle diameter [m]
-tau_p           = [1.5] * n_files          # [-], tortuosity of porous particle
-phi_p           = [0.3] * n_files          # [-], porosity of porous particle    
+tau_p           = [3.0] * n_files          # [-], tortuosity of porous particle
+phi_p           = [0.5] * n_files          # [-], porosity of porous particle    
 r_pore_p        = [300e-9] * n_files       # [-], average pore radius 
 
 cat_loading     = [0.01] * n_files
@@ -291,7 +291,7 @@ if geo_b == 1:
     n_w_rad     = [2] * n_files                 # Number of irradiated walls for heat transfer [--]
     n_w         = [2] * n_files                 # Number of walls for particle drag [--]
 elif geo_b == 2:
-    q_sol_ap    = [300E3] * n_files             # Concentrated solar flux at aperture (before flux spreading) [W/m^2]
+    q_sol_ap    = [150E3] * n_files             # Concentrated solar flux at aperture (before flux spreading) [W/m^2]
     if arr_tube == 1:
         sol_frac_w  = 1                         # Fraction of tube that sees the solar flux (which is assumed to uniformly spread around the tube [--]
     elif arr_tube ==2:
@@ -311,7 +311,7 @@ env['species_names'] = env['obj'].species_names
 
 #%%  Set up vertical mesh for reactor geometry
 y_b         = [2.0] * n_files          # Bed channel height for heat transfer [m]
-n_y_b       = [51] * n_files          # Number of mesh points in the vertical direction of the channel flow
+n_y_b       = [51] * n_files           # Number of mesh points in the vertical direction of the channel flow
 dy_cond_0   = [1e-1] * n_files         # Vertical conduction length at the top of the wall [m]
 dy_cond_L   = [1e-1] * n_files         # Vertical conduction length at the bottom of the wall [m]
 
@@ -324,9 +324,9 @@ if geo_b == 1:
     dz_w_b      = [1E-2] * n_files      # Fluidized bed depth of receiver wall [m]
 
 elif geo_b == 2:
-    d_out_b     = [0.127] * n_files  # Bed outer diameter [m] # 1.5 inch = 31.75e-3 m, 5in = 0.127
+    d_out_b     = [0.1] * n_files  # Bed outer diameter [m] # 1.5 inch = 31.75e-3 m, 5in = 0.127
     #d_out_b     = [31.75e-3, 50.8e-3]   # Bed outer diameter [m]
-    wt          = [2.5e-3] * n_files  # 1.5in OD = 38.1mm OD, 1/8in w.t. = 3.175 mm w.t., 1.25in ID = 31.75mm ID
+    wt          = [2.0e-3] * n_files  # 1.5in OD = 38.1mm OD, 1/8in w.t. = 3.175 mm w.t., 1.25in ID = 31.75mm ID
     d_in_b      = [0E-03] * n_files     # Bed  inner diameter [m]
     d_w_out_b   = [x + 2*y for x, y in zip(d_out_b, wt)] # Bed tube outer diameter [m]
 
@@ -561,8 +561,8 @@ for i_file in range(n_files):
     PartParams['c']             = 500   # [-], compaction modulus
     
     # Drag model and correction factor
-    #PartParams['drag_model']        = 'Gidaspow'
-    PartParams['drag_model']        = 'Syamlal-OBrien'
+    PartParams['drag_model']        = 'Gidaspow'
+    #PartParams['drag_model']        = 'Syamlal-OBrien'
     PartParams['drag_corrector']    = 'phi_star'
     #PartParams['drag_corrector']    = 'none'
     
@@ -652,7 +652,7 @@ for i_file in range(n_files):
     SurfParams['a_Ni_cat']      = (3)*(SurfParams['Ni_vol_ratio'])/SurfParams['R_Ni']  # [m^-1] specific surface area of catalyst
     SurfParams['a_surf']        = 6*SurfParams['phi']/SurfParams['Rpore'] + 6*(1-SurfParams['phi'])/PartParams['dp']
 
-    SurfParams['a_cat']         = SurfParams['a_Ni_cat'] #+ SurfParams['a_surf']
+    SurfParams['a_cat']         = SurfParams['a_Ni_cat'] + SurfParams['a_surf']
 
     # Calculate required properties of porous particle
     SurfParams['vol_Ratio']     = SurfParams['phi'] / (1 - SurfParams['phi']) 
@@ -661,7 +661,7 @@ for i_file in range(n_files):
                                 * SurfParams['eff_factor'] / 72 
     
     # Calculate catalyst mass per area, mcat_per_area [g_cat / m^2]
-    SurfParams['mcat_per_area'] = 1e0 * SurfParams['Ni_mass'] / (SurfParams['a_cat']*SurfParams['Vpart'])
+    SurfParams['mcat_per_area'] = 1e3 * SurfParams['Ni_mass'] / (SurfParams['a_cat']*SurfParams['Vpart'])
     
     # Calculate geometry of particle
     SurfParams['deltar']        = (SurfParams['Rmax'] - SurfParams['Rmin'])

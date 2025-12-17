@@ -204,7 +204,7 @@ def solarReact_Runner(InFilePath, SolFilePath, FileName, Restart):
     jacobian = 1 # 1: with user-defined jacobian, 2: with finite-difference solver jacobian
     ftol = 1e-10
     xtol = 1e-12
-    max_nfev = 100
+    max_nfev = 200
     status_list = [4]
     # Status:
         # -1 : improper input parameters status returned from MINPACK.

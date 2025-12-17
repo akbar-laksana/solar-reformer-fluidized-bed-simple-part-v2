@@ -158,7 +158,7 @@ def solarReact_FluidizedBedEqs(ind, gas, part, wall, surf, WallParams, FinParams
     # Set D_hyd to minimum of measured values and actual D_hyd
     #D_hyd = np.minimum(0.02142, BedParams['D_hyd'])
     D_yy_s, _    = D_T(U_g, U_mf, BedParams['D_hyd'], PartParams['id'])         # assuming s,g,h,mv all have same coefficient1
-    D_yy_g       = BedParams['D_hyd'] * (U_g-U_mf) / 5                               # from Breault (2006) Table 3 Eqn from Werther et al
+    D_yy_g       = BedParams['D_hyd'] * (U_g-U_mf) / 150                               # from Breault (2006) Table 3 Eqn from Werther et al
     
     # Add in dispersion to thermal conductivity
     k_s_disp_interp = interp1d(BedParams['y'], D_yy_s * rho_s * cp_s * phi_bs, kind='linear', fill_value="extrapolate")
@@ -203,6 +203,8 @@ def solarReact_FluidizedBedEqs(ind, gas, part, wall, surf, WallParams, FinParams
     #Set mdotk_pg at first cell to be 0
     #mdotk_pg[0,:] = 0
     #mdotk_g_gen[0,:] = 0
+    
+    mdotk_pg[0,:] = mdotk_pg[1,:]
     
     # Gas momentum generation
     mvdot_gen = np.zeros((BedParams['n_y']))  
@@ -254,6 +256,7 @@ def solarReact_FluidizedBedEqs(ind, gas, part, wall, surf, WallParams, FinParams
         res[ind['start'] + ind['T_bg']]	= mhdot_g_in - mhdot_g_out \
                                         + q_cond_y_g \
                                         + A_sg * h_part_g * (T_bs - T_bg) \
+                                        #+ np.sum(jk_b_hk_b, axis = 1)
                                         #- frac_g * mhdot_gen
                                             
         # 1st term solid enthalpy flow, 2nd solid conduction, 3rd interphasial heat transfer, 4th wall flux
@@ -262,6 +265,7 @@ def solarReact_FluidizedBedEqs(ind, gas, part, wall, surf, WallParams, FinParams
                                         - A_sg * h_part_g * (T_bs - T_bg) \
                                         + q_wb \
                                         - mhdot_gen \
+                                        #- np.sum(jk_b_hk_b, axis = 1)
                     
         #%% Add particle-wall heat transfer flux to the internal wall residual
         res[ind['start'] + ind['T_wb']]     = - q_wb    # heat loss from the bed wall to the particles [W]
@@ -297,7 +301,7 @@ def solarReact_FluidizedBedEqs(ind, gas, part, wall, surf, WallParams, FinParams
                         + mvdot_gen
     
     #%% Set gas mass fractions residuals based on species equation
-    source = 1 # 1:mdotk_g_gen, 2: mdotk_pg
+    source = 2 # 1:mdotk_g_gen, 2: mdotk_pg
     if source == 1:
         spec_source = mdotk_g_gen
     elif source == 2:
@@ -315,7 +319,7 @@ def solarReact_FluidizedBedEqs(ind, gas, part, wall, surf, WallParams, FinParams
             
     #%% Boundary Condition for residual equations
     res[ind['start'][0] + ind['Yk_bg']]     = 1e2*(Yk_bg[0,:] - GasParams['Y_in'][:])  # inlet mass fraction
-    res[ind['start'][0] + ind['phi_bs']]    = 1e2*(phi_bs[1] - phi_bs[0])    # inlet solid volume fraction
+    #res[ind['start'][0] + ind['phi_bs']]    = 1e2*(phi_bs[1] - phi_bs[0])    # inlet solid volume fraction
     #res[ind['start'][0] + ind['P_bg']]      = 1e4*(P_bg[0] - GasParams['P_in'])    # inlet gas pressure
     res[ind['start'][0] + ind['T_bg']]      = 1e2*(T_bg[0] - GasParams['T_in'])
     #res[ind['start'][1] + ind['T_bg']]      = 1e4*(T_bg[1] - T_bg[0])

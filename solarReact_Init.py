@@ -101,7 +101,7 @@ def solarReact_Init(gas, gas_surf, part, wall, surf, GasParams, PartParams, BedP
     
     #%% Estimated performance metrics
     hT_guess    = 2000                           # [W/m^2-K]
-    eta_th      = 0.80                           # [-]
+    eta_th      = 0.70                           # [-]
     
     #%% Calculate absorbed solar flux
     q_abs       = EnvParams['q_sol_dist'] * BedParams['n_w'] * EnvParams['q_sol']             # [W/m^2]
@@ -179,6 +179,7 @@ def solarReact_Init(gas, gas_surf, part, wall, surf, GasParams, PartParams, BedP
     Xk_bg_out_eq   = gas['obj'].X
     T_bg_out_eq    = gas['obj'].T
     
+
     # Modify initialization with 'extent of reaction' factor, values unchanged if kappa = 1
     Yk_bg_out       = GasParams['Y_in'] + epsilon * (Yk_bg_out_eq - GasParams['Y_in'])
     gas['obj'].HPY  = h_out_g, P_bg_out, Yk_bg_out
@@ -298,6 +299,16 @@ def solarReact_Init(gas, gas_surf, part, wall, surf, GasParams, PartParams, BedP
             surf['obj'].advance_coverages(1.5e2, 1e-7, 1e-14, 1e-0, 5e8, 20)
         SurfParams['Zk_p_init'][i_y, :] = surf['obj'].coverages
     
+    #%%
+    print(f"Equilibrium outlet temperature = {T_bg_out_eq - 273.15:.2f} [\degree C]")
+    
+    if (T_bg_out_eq - 273.15 ) > 800 :
+        print(f"!!!!!! WARNING !!!!!!")
+        print(f"Expected bed temperature above 800 C")
+        print(f"Increase mass flow rate or reduce solar concentration")
+    
+    print(f"Average U_hat = {U_hat_avg} [-]")
+
     #%% Lsqnonlin Bounds
     # Set generic bounds of 0, inf
     boundsLow =  np.zeros((ind['tot']))
@@ -364,27 +375,27 @@ def solarReact_Init(gas, gas_surf, part, wall, surf, GasParams, PartParams, BedP
         elif var_name == 'phi_bs':  
             scale['var'][ind['start'] + ind['phi_bs']]  = 1e0
             scale['res_phi_bs']                         = 1e-0
-            scale['res'][ind['start'] + ind['phi_bs']]  = scale['res_phi_bs'] * abs(GasParams['mdot_in'] * v_bg[0] ) #
+            scale['res'][ind['start'] + ind['phi_bs']]  = scale['res_phi_bs'] * abs(GasParams['mdot_in']  ) #* v_bg[0]
             SV_guess[ind['start'] + ind['phi_bs']]        = phi_bs / scale['var'][ind['start'] + ind['phi_bs']]
             boundsLow[ind['start'] + ind['phi_bs']]     = 0.2 / scale['var'][ind['start'] + ind['phi_bs']]
             boundsUp[ind['start'] + ind['phi_bs']]      = 0.8 / scale['var'][ind['start'] + ind['phi_bs']]
             
             # res_2 denotes scaling when restart is activated
             scale['res_2_phi_bs']                         = 1e-0
-            scale['res_2'][ind['start'] + ind['phi_bs']]  = scale['res_2_phi_bs'] * abs(GasParams['mdot_in'] * v_bg[0] ) #
+            scale['res_2'][ind['start'] + ind['phi_bs']]  = scale['res_2_phi_bs'] * abs(GasParams['mdot_in']  ) #* v_bg[0]
             
         # Particle Solid Volume Fraction
         elif var_name == 'P_bg':  
             scale['var'][ind['start'] + ind['P_bg']]    = 1e5
             scale['res_P_bg']                           = 1e-0
-            scale['res'][ind['start'] + ind['P_bg']]    = scale['res_P_bg'] * abs(GasParams['mdot_in'] * v_bg[0] ) #
+            scale['res'][ind['start'] + ind['P_bg']]    = scale['res_P_bg'] * abs(GasParams['mdot_in']  ) #* v_bg[0]
             SV_guess[ind['start'] + ind['P_bg']]        = P_bg / scale['var'][ind['start'] + ind['P_bg']]
             boundsLow[ind['start'] + ind['P_bg']]       = (0.5*P_bg_out) / scale['var'][ind['start'] + ind['P_bg']]
             boundsUp[ind['start'] + ind['P_bg']]        = (2*P_bg_out) / scale['var'][ind['start'] + ind['P_bg']]
             
             # res_2 denotes scaling when restart is activated
             scale['res_2_P_bg']                         = 1e-0
-            scale['res_2'][ind['start'] + ind['P_bg']]  = scale['res_2_P_bg'] * abs(GasParams['mdot_in'] * v_bg[0] ) #
+            scale['res_2'][ind['start'] + ind['P_bg']]  = scale['res_2_P_bg'] * abs(GasParams['mdot_in']  ) #* v_bg[0]
             
         # Gas Mass Fraction at the bed
         elif var_name == 'Yk_bg':  
@@ -412,11 +423,11 @@ def solarReact_Init(gas, gas_surf, part, wall, surf, GasParams, PartParams, BedP
             for i_spec in range(gas['kspec'] ):
                 scale['var'][ind['start'] + ind['Yk_p_int'][i_spec]]    = 1e0
                 if i_spec == gas['kH2']:
-                    scale['res_Yk_p_int']                               = 1e-4
-                    scale['res_2_Yk_p_int']                             = 1e-4
+                    scale['res_Yk_p_int']                               = 1e-2
+                    scale['res_2_Yk_p_int']                             = 1e-2
                 else:
-                    scale['res_Yk_p_int']                               = 1e-4
-                    scale['res_2_Yk_p_int']                             = 1e-4
+                    scale['res_Yk_p_int']                               = 1e-2
+                    scale['res_2_Yk_p_int']                             = 1e-2
                 scale['res'][ind['start'] + ind['Yk_p_int'][i_spec]]    = scale['res_Yk_p_int'] * abs(GasParams['mdot_in'])
                 SV_guess[ind['start'] + ind['Yk_p_int'][i_spec]]        = Yk_bg[:, i_spec] / scale['var'][ind['start'] + ind['Yk_p_int'][i_spec]]
                 boundsLow[ind['start'] + ind['Yk_p_int'][i_spec]]       = 0 / scale['var'][ind['start'] + ind['Yk_p_int'][i_spec]]
@@ -429,11 +440,11 @@ def solarReact_Init(gas, gas_surf, part, wall, surf, GasParams, PartParams, BedP
             for i_spec in range(gas['kspec'] ):
                 scale['var'][ind['start'] + ind['Yk_p'][i_spec]]    = 1e0
                 if i_spec == gas['kH2']:
-                    scale['res_Yk_p']                               = 1e-4
-                    scale['res_2_Yk_p']                             = 1e-4
+                    scale['res_Yk_p']                               = 1e-2
+                    scale['res_2_Yk_p']                             = 1e-2
                 else:
-                    scale['res_Yk_p']                               = 1e-4
-                    scale['res_2_Yk_p']                             = 1e-4
+                    scale['res_Yk_p']                               = 1e-2
+                    scale['res_2_Yk_p']                             = 1e-2
                 scale['res'][ind['start'] + ind['Yk_p'][i_spec]]    = scale['res_Yk_p'] * abs(GasParams['mdot_in'])
                 SV_guess[ind['start'] + ind['Yk_p'][i_spec]]        = Yk_p[:, i_spec] / scale['var'][ind['start'] + ind['Yk_p'][i_spec]]
                 boundsLow[ind['start'] + ind['Yk_p'][i_spec]]       = 0 / scale['var'][ind['start'] + ind['Yk_p'][i_spec]]

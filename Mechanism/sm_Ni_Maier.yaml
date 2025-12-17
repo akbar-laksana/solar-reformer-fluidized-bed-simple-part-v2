@@ -52,6 +52,12 @@ phases:
   species: [H2, O2, CH4, H2O, CO2, CO]
   transport: mixture-averaged
   state: {T: 300.0, P: 1 atm}
+- name: reformate-part-nosurf
+  thermo: ideal-gas
+  elements: [C, H, O]
+  species: [H2, CH4, H2O, CO2, CO]
+  transport: mixture-averaged
+  state: {T: 300.0, P: 1 atm}
 - name: reformate
   thermo: ideal-gas
   elements: [C, H, O, N]

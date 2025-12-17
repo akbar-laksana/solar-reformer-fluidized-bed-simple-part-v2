@@ -37,6 +37,8 @@ def ParticleModel_Boundary_flux(gas, PartParams, P_1, Yk_1, T_1, P_2, Yk_2, T_2,
         # Gunn 1978
         b['Sh_k'] = (7 - 10*phi_bg + 5*phi_bg**2)*(1 + 0.7*b['Re']**0.2 * b['Sc']**(1/3)) \
         + (1.33 - 2.4*phi_bg + 1.2*phi_bg**2)*(b['Re']**0.7 * b['Sc']**(1/3))
+    elif PartParams['Sherwood'] == 'constant':
+        b['Sh_k'] = 3.5  # (DeCaluwe et al)
     
     # Give multiplication factor to Sherwood, or override
     b['Sh_k'] = 1e0 * b['Sh_k']
@@ -47,13 +49,10 @@ def ParticleModel_Boundary_flux(gas, PartParams, P_1, Yk_1, T_1, P_2, Yk_2, T_2,
     # Mass flux at the boundary
     jk_b = b['rho_b'] * b['Sh_k'] * D_k_b * (Yk_1 - Yk_2) / PartParams['dp']
     
-    # Constant Sh of 3.5 (DeCaluwe et al)
-    #jk_b = b['rho_b'] * 3.5 * D_k_b * (Yk_1 - Yk_2) / PartParams['dp']
-    
     # Corrective flux scaling to Yk_b
     jk_corr = np.sum(jk_b) * b['Yk_b']
     #jk_corr = np.sum(jk_b)/gas['kspec'] * np.ones((gas['kspec']))
-    jk_b -= jk_corr
+    jk_b = jk_b - jk_corr
     
     # Do checking on sum of jk_b to see how mass neutral it is
     sumjk_b = np.sum(jk_b)
