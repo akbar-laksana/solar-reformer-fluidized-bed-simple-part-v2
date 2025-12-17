@@ -66,13 +66,15 @@ def solarReact_PartModEqs_SingleCellPart(gas, surf, GasParams, PartParams, BedPa
 
 #%% Residual function for multi cell particle model equations (only solving for Yk_p)
 def solarReact_PartModEqs_SimplePart(gas, gas_surf, surf, GasParams, PartParams, BedParams, SurfParams, ind,  \
-                          T_p, Yk_p, Yk_p_int, P_p, Xk_p, Xk_p_int, P_bg, T_bg, Yk_bg, v_bg, v_bs, phi_bg, phi_bs):
+                          T_p, Yk_p, Yk_p_int, P_p, Xk_p, Xk_p_int, P_bg, T_bg, Yk_bg, Xk_bg, v_bg, v_bs, phi_bg, phi_bs):
     
     # Initialize residual and property vectors calculated from Cantera objects
     res = np.zeros(ind['tot'])
     
     # Initialize species production and consumption rate
     sdot_g = np.zeros((BedParams['n_y'], gas['kspec']))
+    sdot_g_bulk = np.zeros((BedParams['n_y'], gas['kspec']))
+
     
     # Initialize vector of species' mass flux
     jk_DGM  = np.zeros((BedParams['n_y'], gas['kspec']))
@@ -82,6 +84,22 @@ def solarReact_PartModEqs_SimplePart(gas, gas_surf, surf, GasParams, PartParams,
     for i_y in range(BedParams['n_y']):
         # Calculate the relative velocity of gas and particle
         U_inf = abs(v_bg[i_y] - v_bs[i_y])
+        
+        if BedParams['kinetics'] == 1:
+            # Reaction rate at bulk condition
+            sdot_g_bulk[i_y, :], _ = KineticFun(ind, gas, Xk_bg[i_y, :], T_bg[i_y], P_bg[i_y], SurfParams)
+        elif BedParams['kinetics'] == 2:
+            # Gas species production rate from detailed surface chemistry
+            gas_surf['obj'].set_unnormalized_mass_fractions(np.concatenate((Yk_p[i_y, :, 0], [0])))
+            gas_surf['obj'].TP = T_bg[i_y], P_bg[i_y]
+            
+            # Set the surface species composition and integrate to steady state
+            surf['obj'].set_unnormalized_coverages(SurfParams['Zk_p_init'][i_y, :, 0])
+            surf['obj'].TP = T_bg[i_y], P_bg[i_y]
+            #if SurfParams['integrate'] == 1:
+                #surf['obj'].advance_coverages(SurfParams['delta_t'], 1e-6, 1e-12, 1e-4, 1e8, 20)
+        
+            sdot_g_bulk[i_y, :] = surf['obj'].get_net_production_rates('reformate-part')[:-1]
         
         # Set the gas species
         gas['obj'].TPY = T_p[i_y], P_p[i_y], Yk_p[i_y, :]

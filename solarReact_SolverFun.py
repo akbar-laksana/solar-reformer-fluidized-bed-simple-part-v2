@@ -32,7 +32,7 @@ def solarReact_SolverFun(SV, gas, gas_surf, part, wall, surf, env, GasParams, Pa
     # Particle model governing equations
     if PartParams['simple_part'] == 1:
         part_res, jk_bound, sdot_g = solarReact_PartModEqs_SimplePart(gas, gas_surf, surf, GasParams, PartParams, BedParams, SurfParams, ind, \
-                                    T_p, Yk_p, Yk_p_int, P_p, Xk_p, Xk_p_int, P_bg, T_bg, Yk_bg, v_bg, v_bs, phi_bg, phi_bs)
+                                    T_p, Yk_p, Yk_p_int, P_p, Xk_p, Xk_p_int, P_bg, T_bg, Yk_bg, Xk_bg, v_bg, v_bs, phi_bg, phi_bs)
     elif PartParams['multi_part'] == 1:
         part_res, jk_bound, sdot_g, sdot_g_bulk, eta_cat_k = solarReact_PartModEqs_MultiCellPart(gas, gas_surf, surf, GasParams, PartParams, BedParams, SurfParams, ind, \
                                                     T_p, Yk_p, P_p, Xk_p, P_bg, T_bg, Yk_bg, Xk_bg, v_bg, v_bs, phi_bg)
